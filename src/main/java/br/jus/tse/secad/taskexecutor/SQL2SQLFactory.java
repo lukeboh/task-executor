@@ -10,8 +10,8 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 
-public class PopulaAA_QTD_SECAO_SEM_PINCAFactory implements RunnableFactory {
-	private static Logger log = Logger.getLogger(PopulaAA_QTD_SECAO_SEM_PINCAFactory.class);
+public class SQL2SQLFactory implements RunnableFactory {
+	private static Logger log = Logger.getLogger(SQL2SQLFactory.class);
 
 	int size = 0;
 
@@ -21,7 +21,7 @@ public class PopulaAA_QTD_SECAO_SEM_PINCAFactory implements RunnableFactory {
 
 	private ResultSet resultSet;
 
-	public PopulaAA_QTD_SECAO_SEM_PINCAFactory() throws Exception {
+	public SQL2SQLFactory() throws Exception {
 		
 		Properties prop = new Properties();
 		prop.load(new FileInputStream("config.properties"));
@@ -59,7 +59,7 @@ public class PopulaAA_QTD_SECAO_SEM_PINCAFactory implements RunnableFactory {
 				String pmt2 = resultSet.getString(2);
 				String pmt3 = resultSet.getString(3);
 				
-				return new PopulaAA_QTD_SECAO_SEM_PINCARunnable(index, pmt1, pmt2, pmt3);
+				return new SQL2SQLRunnable(index, pmt1, pmt2, pmt3);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -72,7 +72,7 @@ public class PopulaAA_QTD_SECAO_SEM_PINCAFactory implements RunnableFactory {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		DefaultTaskExecutor dte = new DefaultTaskExecutor(new PopulaAA_QTD_SECAO_SEM_PINCAFactory());
+		DefaultTaskExecutor dte = new DefaultTaskExecutor(new SQL2SQLFactory());
 		dte.showUI();
 		dte.start();
 	}

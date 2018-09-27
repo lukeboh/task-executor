@@ -2,14 +2,14 @@ package br.jus.tse.secad.taskexecutor;
 
 import org.apache.log4j.Logger;
 
-public class PopulaAA_QTD_SECAO_SEM_PINCARunnable implements Runnable{
+public class SQL2SQLRunnable implements Runnable{
 	
-	private static Logger log = Logger.getLogger(PopulaAA_QTD_SECAO_SEM_PINCARunnable.class);
+	private static Logger log = Logger.getLogger(SQL2SQLRunnable.class);
 	
 	public int index;
 	public String pmt1, pmt2, pmt3;
 	
-	public PopulaAA_QTD_SECAO_SEM_PINCARunnable(int index, String pmt1, String pmt2, String pmt3) {
+	public SQL2SQLRunnable(int index, String pmt1, String pmt2, String pmt3) {
 		this.index = index;
 		this.pmt1 = pmt1;
 		this.pmt2 = pmt2;
