@@ -21,16 +21,18 @@ public class SQL2SQLFactory implements RunnableFactory {
 
 	private ResultSet resultSet;
 
+	private Properties properties;
+
 	public SQL2SQLFactory() throws Exception {
 		
-		Properties prop = new Properties();
-		prop.load(new FileInputStream("config.properties"));
+		properties = new Properties();
+		properties.load(new FileInputStream("config.properties"));
 		
 		Class.forName("oracle.jdbc.driver.OracleDriver");
-		String url = prop.getProperty("producao.URL");
-		String user = prop.getProperty("producao.user");
-		String password = prop.getProperty("producao.password");
-		String sqlSize = prop.getProperty("sqlSize");
+		String url = properties.getProperty("producao.URL");
+		String user = properties.getProperty("producao.user");
+		String password = properties.getProperty("producao.password");
+		String sqlSize = properties.getProperty("sqlSize");
 		
 		connection = null;
 		connection = DriverManager.getConnection(url, user, password);
@@ -44,7 +46,7 @@ public class SQL2SQLFactory implements RunnableFactory {
 		resultSet.close();
 		statement.close();
 		
-		String sql = prop.getProperty("sql");
+		String sql = properties.getProperty("sql");
 		statement = connection.prepareStatement(sql);
 		resultSet = statement.executeQuery();
 	}
@@ -69,6 +71,10 @@ public class SQL2SQLFactory implements RunnableFactory {
 
 	public int size() {
 		return size;
+	}
+	
+	public Properties getProperties() {
+		return properties;
 	}
 	
 	public static void main(String[] args) throws Exception {
