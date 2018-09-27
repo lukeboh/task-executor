@@ -55,8 +55,11 @@ public class PopulaAA_QTD_SECAO_SEM_PINCAFactory implements RunnableFactory {
 				return null;
 			else {
 				index++;
-				String codObjetoSecao = resultSet.getString(1);
-				return new PopulaAA_QTD_SECAO_SEM_PINCARunnable(index, codObjetoSecao);
+				String pmt1 = resultSet.getString(1);
+				String pmt2 = resultSet.getString(2);
+				String pmt3 = resultSet.getString(3);
+				
+				return new PopulaAA_QTD_SECAO_SEM_PINCARunnable(index, pmt1, pmt2, pmt3);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
