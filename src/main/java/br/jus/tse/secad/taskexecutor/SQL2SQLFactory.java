@@ -28,15 +28,9 @@ public class SQL2SQLFactory implements RunnableFactory {
 		properties = new Properties();
 		properties.load(new FileInputStream("config.properties"));
 		
-		Class.forName("oracle.jdbc.driver.OracleDriver");
-		String url = properties.getProperty("producao.URL");
-		String user = properties.getProperty("producao.user");
-		String password = properties.getProperty("producao.password");
+		connection = createConnection();
+		
 		String sqlSize = properties.getProperty("sqlSize");
-		
-		connection = null;
-		connection = DriverManager.getConnection(url, user, password);
-		
 		PreparedStatement statement = connection.prepareStatement(sqlSize);
 		resultSet = statement.executeQuery();
 		resultSet.next();
@@ -51,6 +45,17 @@ public class SQL2SQLFactory implements RunnableFactory {
 		resultSet = statement.executeQuery();
 	}
 
+	public Connection createConnection() throws ClassNotFoundException, SQLException {
+		Class.forName("oracle.jdbc.driver.OracleDriver");
+		String url = properties.getProperty("producao.URL");
+		String user = properties.getProperty("producao.user");
+		String password = properties.getProperty("producao.password");
+		
+		Connection c = DriverManager.getConnection(url, user, password);
+		c.setAutoCommit(false);
+		return c;
+	}
+
 	public Runnable next() {
 		try {
 			if (!resultSet.next())
@@ -61,7 +66,7 @@ public class SQL2SQLFactory implements RunnableFactory {
 				String pmt2 = resultSet.getString(2);
 				String pmt3 = resultSet.getString(3);
 				
-				return new SQL2SQLRunnable(index, pmt1, pmt2, pmt3);
+				return new SQL2SQLRunnable(this, index, pmt1, pmt2, pmt3);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
