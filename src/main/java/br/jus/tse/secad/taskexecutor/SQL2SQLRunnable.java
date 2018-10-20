@@ -26,52 +26,52 @@ public class SQL2SQLRunnable implements Runnable {
 	}
 
 	public void run() {
-		Connection connection = null;
-		PreparedStatement statement = null;
-		ResultSet rs = null;
+		Connection targetConnection = null;
+		PreparedStatement targetStatement = null;
+		ResultSet targetResultSet = null;
 		try {
 			log.info("Entrada [" + index + "] [" + pmt1 + "] [" + pmt2 + "] [" + pmt3 + "]");
-			connection = factory.createConnection();
+			targetConnection = factory.getTargetConnection();
 
-			String sql2 = factory.getProperties().getProperty("sql2");
-			statement = connection.prepareStatement(sql2);
-			statement.setString(1, pmt1);
-			rs = statement.executeQuery();
-			rs.next();
-			int pmt4 = rs.getInt(1);
-			rs.close();
-			statement.close();
+			String targetSql= factory.getProperties().getProperty("db.target.sql.1");
+			targetStatement = targetConnection.prepareStatement(targetSql);
+			targetStatement.setString(1, pmt1);
+			targetResultSet = targetStatement.executeQuery();
+			targetResultSet.next();
+			int pmt4 = targetResultSet.getInt(1);
+			targetResultSet.close();
+			targetStatement.close();
 
-			String sqlUpdate = factory.getProperties().getProperty("sqlUpdate");
-			statement = connection.prepareStatement(sqlUpdate);
-			statement.setString(1, pmt1);
-			statement.setString(2, pmt2);
-			statement.setString(3, pmt3);
-			statement.setInt(4, pmt4);
-			statement.executeUpdate();
-			connection.commit();
+			targetSql = factory.getProperties().getProperty("db.target.sql.2");
+			targetStatement = targetConnection.prepareStatement(targetSql);
+			targetStatement.setString(1, pmt1);
+			targetStatement.setString(2, pmt2);
+			targetStatement.setString(3, pmt3);
+			targetStatement.setInt(4, pmt4);
+			targetStatement.executeUpdate();
+			targetConnection.commit();
 			log.info("Saída [" + index + "] [" + pmt1 + "] [" + pmt2 + "] [" + pmt3 + "] [" + pmt4 + "]");
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (rs != null) {
+			if (targetResultSet != null) {
 				try {
-					rs.close();
+					targetResultSet.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			if (statement != null) {
+			if (targetStatement != null) {
 				try {
-					statement.close();
+					targetStatement.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			if (connection != null)
+			if (targetConnection != null)
 				try {
-					connection.close();
+					targetConnection.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}

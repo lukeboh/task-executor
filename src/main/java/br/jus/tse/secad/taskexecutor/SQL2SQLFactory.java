@@ -11,60 +11,66 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 
 public class SQL2SQLFactory implements RunnableFactory {
+	
+	private static final String CONFIG_PROPERTIES_FILENAME = "config.properties";
+
+	private static final String JDBC_DRIVER_NAME = "oracle.jdbc.driver.OracleDriver";
+
+	private static final String DB_SOURCE_USER = "db.source.user";
+	private static final String DB_SOURCE_PASSWORD = "db.source.password";
+	private static final String DB_SOURCE_URL = "db.source.url";
+	private static final String DB_SOURCE_SQL_SIZE = "db.source.sql.size";
+	private static final String DB_SOURCE_SQL = "db.source.sql";
+
+	private static final String DB_TARGET_USER = "db.target.user";
+	private static final String DB_TARGET_PASSWORD = "db.target.password";
+	private static final String DB_TARGET_URL = "db.target.url";
+	
+	
 	private static Logger log = Logger.getLogger(SQL2SQLFactory.class);
 
 	int size = 0;
 
 	int index = 0;
 
-	private Connection connection;
+	private Connection sourceConnection;
 
-	private ResultSet resultSet;
+	private ResultSet sourceResultSet;
 
 	private Properties properties;
 
 	public SQL2SQLFactory() throws Exception {
 		
 		properties = new Properties();
-		properties.load(new FileInputStream("config.properties"));
+		properties.load(new FileInputStream(CONFIG_PROPERTIES_FILENAME));
 		
-		connection = createConnection();
+		sourceConnection = getSourceConnection();
 		
-		String sqlSize = properties.getProperty("sqlSize");
-		PreparedStatement statement = connection.prepareStatement(sqlSize);
-		resultSet = statement.executeQuery();
-		resultSet.next();
-		size = resultSet.getInt(1);
+		String sourceSqlSize = properties.getProperty(DB_SOURCE_SQL_SIZE);
+		PreparedStatement sourceStatement = sourceConnection.prepareStatement(sourceSqlSize);
+		sourceResultSet = sourceStatement.executeQuery();
+		sourceResultSet.next();
+		size = sourceResultSet.getInt(1);
 		log.info("Size [" + size + "]");
 		
-		resultSet.close();
-		statement.close();
+		sourceResultSet.close();
+		sourceStatement.close();
 		
-		String sql = properties.getProperty("sql");
-		statement = connection.prepareStatement(sql);
-		resultSet = statement.executeQuery();
+		String sourceSql = properties.getProperty(DB_SOURCE_SQL);
+		sourceStatement = sourceConnection.prepareStatement(sourceSql);
+		sourceResultSet = sourceStatement.executeQuery();
 	}
-
-	public Connection createConnection() throws ClassNotFoundException, SQLException {
-		Class.forName("oracle.jdbc.driver.OracleDriver");
-		String url = properties.getProperty("producao.URL");
-		String user = properties.getProperty("producao.user");
-		String password = properties.getProperty("producao.password");
-		
-		Connection c = DriverManager.getConnection(url, user, password);
-		c.setAutoCommit(false);
-		return c;
-	}
-
+	
+	
 	public Runnable next() {
 		try {
-			if (!resultSet.next())
+			if (!sourceResultSet.next())
 				return null;
 			else {
 				index++;
-				String pmt1 = resultSet.getString(1);
-				String pmt2 = resultSet.getString(2);
-				String pmt3 = resultSet.getString(3);
+				String pmt1 = sourceResultSet.getString(1);
+				String pmt2 = sourceResultSet.getString(2);
+				String pmt3 = sourceResultSet.getString(3);
 				
 				return new SQL2SQLRunnable(this, index, pmt1, pmt2, pmt3);
 			}
@@ -80,6 +86,31 @@ public class SQL2SQLFactory implements RunnableFactory {
 	
 	public Properties getProperties() {
 		return properties;
+	}
+	
+	public Connection getSourceConnection() throws ClassNotFoundException, SQLException {
+		Class.forName(JDBC_DRIVER_NAME);
+		String url = properties.getProperty(DB_SOURCE_URL);
+		String user = properties.getProperty(DB_SOURCE_USER);
+		String password = properties.getProperty(DB_SOURCE_PASSWORD);
+		
+		return createConnection(url, user, password);
+	}
+	
+	public Connection getTargetConnection() throws ClassNotFoundException, SQLException {
+		Class.forName(JDBC_DRIVER_NAME);
+		String url = properties.getProperty(DB_TARGET_URL);
+		String user = properties.getProperty(DB_TARGET_USER);
+		String password = properties.getProperty(DB_TARGET_PASSWORD);
+		
+		return createConnection(url, user, password);
+	}
+	
+	private Connection createConnection(String url, String user, String password) throws ClassNotFoundException, SQLException {
+		Class.forName(JDBC_DRIVER_NAME);
+		Connection c = DriverManager.getConnection(url, user, password);
+		c.setAutoCommit(false);
+		return c;
 	}
 	
 	public static void main(String[] args) throws Exception {
