@@ -9,6 +9,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 
 import br.jus.tse.secad.taskexecutor.util.NamedParamStatement;
+import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
 
 public class SQL2SQLRunnable implements Runnable {
 
@@ -34,7 +35,7 @@ public class SQL2SQLRunnable implements Runnable {
 			log.info("Entrada [" + namedParameterMap.get("COD_OBJETO") + "]");
 			targetConnection = factory.getTargetConnection();
 
-			String targetSql = factory.getProperties().getProperty("db.target.sql.1");
+			String targetSql = PropertiesUtil.getProperty("db.target.sql.1");
 			NamedParamStatement namedParamStatement = new NamedParamStatement(targetConnection, targetSql,
 					namedParameterMap);
 

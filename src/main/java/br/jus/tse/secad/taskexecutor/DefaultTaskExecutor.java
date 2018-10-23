@@ -7,6 +7,8 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
+import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
+
 /**
  * Conceitos: Task: Tarefa a ser executada. Tarefas são produzidas para serem consumidas. Threads:
  * Aqueles que executam/consomem as tasks.
@@ -22,7 +24,7 @@ public class DefaultTaskExecutor extends AbstractTaskExecutor {
 	 */
 	private int initialThreadsSize = 0;
 
-	private BlockingQueue<Runnable> tasksQueue = new LinkedBlockingQueue<Runnable>(200);
+	private BlockingQueue<Runnable> tasksQueue = new LinkedBlockingQueue<Runnable>(PropertiesUtil.getQueueSize());
 
 	private ThreadPoolExecutor threadPool;
 	/**
