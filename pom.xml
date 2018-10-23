@@ -1,16 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>br.gov.tse.secad.aplicacoes</groupId>
 	<artifactId>task-executor</artifactId>
 	<version>1.0.1-SNAPSHOT</version>
-	<name>Aplicacao - ${project.artifactId} - Executor de Tarefas - ${project.version}</name>	
+	<name>Aplicacao - ${project.artifactId} - Executor de Tarefas - ${project.version}</name>
 	<distributionManagement>
 		<repository>
 			<id>secad.releases</id>
 			<name>Repositorio de Releases da SECAD</name>
 			<url>http://repo.tse.jus.br/maven/secad.releases</url>
 		</repository>
-		<snapshotRepository> 
+		<snapshotRepository>
 			<id>secad.snapshots</id>
 			<name>Repositorio de SNAPSHOTS da SECAD</name>
 			<url>http://repo.tse.jus.br/maven/secad.snapshots</url>
@@ -72,10 +73,9 @@ line.separator=\r\n]]>
 			<version>1.2.16</version>
 		</dependency>
 		<dependency>
-            <groupId>com.github.noraui</groupId>
-            <artifactId>ojdbc7</artifactId>
-            <version>12.1.0.2</version>
-            <scope>runtime</scope>
-        </dependency>
+			<groupId>com.oracle</groupId>
+			<artifactId>ojdbc7</artifactId>
+			<version>12.1.0.1.0</version>
+		</dependency>
 	</dependencies>
 </project>
