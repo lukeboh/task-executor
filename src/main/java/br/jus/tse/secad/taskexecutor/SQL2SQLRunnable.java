@@ -4,25 +4,26 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
+
+import br.jus.tse.secad.taskexecutor.util.NamedParamStatement;
 
 public class SQL2SQLRunnable implements Runnable {
 
 	private static Logger log = Logger.getLogger(SQL2SQLRunnable.class);
 
 	public int index;
-	public String pmt1, pmt2, pmt3;
 
 	private SQL2SQLFactory factory;
 
-	public SQL2SQLRunnable(SQL2SQLFactory sql2sqlFactory, int index, String pmt1, String pmt2, String pmt3) {
-		this.factory = sql2sqlFactory;
-		this.index = index;
-		this.pmt1 = pmt1;
-		this.pmt2 = pmt2;
-		this.pmt3 = pmt3;
+	private HashMap<String, Object> namedParameterMap;
 
+	public SQL2SQLRunnable(SQL2SQLFactory sql2sqlFactory, int index2, HashMap<String, Object> namedParameterMap) {
+		this.factory = sql2sqlFactory;
+		this.index = index2;
+		this.namedParameterMap = namedParameterMap;
 	}
 
 	public void run() {
@@ -30,28 +31,24 @@ public class SQL2SQLRunnable implements Runnable {
 		PreparedStatement targetStatement = null;
 		ResultSet targetResultSet = null;
 		try {
-			log.info("Entrada [" + index + "] [" + pmt1 + "] [" + pmt2 + "] [" + pmt3 + "]");
+			log.info("Entrada [" + namedParameterMap.get("COD_OBJETO") + "]");
 			targetConnection = factory.getTargetConnection();
 
-			String targetSql= factory.getProperties().getProperty("db.target.sql.1");
-			targetStatement = targetConnection.prepareStatement(targetSql);
-			targetStatement.setString(1, pmt1);
-			targetResultSet = targetStatement.executeQuery();
-			targetResultSet.next();
-			int pmt4 = targetResultSet.getInt(1);
-			targetResultSet.close();
-			targetStatement.close();
+			String targetSql = factory.getProperties().getProperty("db.target.sql.1");
+			NamedParamStatement namedParamStatement = new NamedParamStatement(targetConnection, targetSql,
+					namedParameterMap);
 
-			targetSql = factory.getProperties().getProperty("db.target.sql.2");
-			targetStatement = targetConnection.prepareStatement(targetSql);
-			targetStatement.setString(1, pmt1);
-			targetStatement.setString(2, pmt2);
-			targetStatement.setString(3, pmt3);
-			targetStatement.setInt(4, pmt4);
-			targetStatement.executeUpdate();
-			targetConnection.commit();
-			log.info("Saída [" + index + "] [" + pmt1 + "] [" + pmt2 + "] [" + pmt3 + "] [" + pmt4 + "]");
+			targetStatement = namedParamStatement.getPreparedStatement();
 
+			int count = targetStatement.executeUpdate();
+			if (count > 0) {
+				targetConnection.commit();
+				log.info("Atualizado [" + index + "] [" + namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
+						+ "]");
+			} else {
+				log.info("Não Atualizado[" + index + "] [" + namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
+					+ "]");
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {

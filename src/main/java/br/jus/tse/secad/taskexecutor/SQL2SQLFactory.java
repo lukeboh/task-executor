@@ -6,6 +6,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,7 @@ public class SQL2SQLFactory implements RunnableFactory {
 	private Properties properties;
 
 	public SQL2SQLFactory() throws Exception {
+		Class.forName(JDBC_DRIVER_NAME);
 		
 		properties = new Properties();
 		properties.load(new FileInputStream(CONFIG_PROPERTIES_FILENAME));
@@ -68,11 +70,16 @@ public class SQL2SQLFactory implements RunnableFactory {
 				return null;
 			else {
 				index++;
-				String pmt1 = sourceResultSet.getString(1);
-				String pmt2 = sourceResultSet.getString(2);
-				String pmt3 = sourceResultSet.getString(3);
 				
-				return new SQL2SQLRunnable(this, index, pmt1, pmt2, pmt3);
+				HashMap<String, Object> namedParameterMap = new HashMap<String, Object>(sourceResultSet.getMetaData().getColumnCount());
+				
+				for(int i = 1; i <= sourceResultSet.getMetaData().getColumnCount(); i++) {
+					String columnName = sourceResultSet.getMetaData().getColumnName(i);
+					Object columnValue = sourceResultSet.getString(i);
+					namedParameterMap.put(columnName, columnValue);
+				}
+				
+				return new SQL2SQLRunnable(this, index, namedParameterMap);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -89,7 +96,6 @@ public class SQL2SQLFactory implements RunnableFactory {
 	}
 	
 	public Connection getSourceConnection() throws ClassNotFoundException, SQLException {
-		Class.forName(JDBC_DRIVER_NAME);
 		String url = properties.getProperty(DB_SOURCE_URL);
 		String user = properties.getProperty(DB_SOURCE_USER);
 		String password = properties.getProperty(DB_SOURCE_PASSWORD);
@@ -98,7 +104,6 @@ public class SQL2SQLFactory implements RunnableFactory {
 	}
 	
 	public Connection getTargetConnection() throws ClassNotFoundException, SQLException {
-		Class.forName(JDBC_DRIVER_NAME);
 		String url = properties.getProperty(DB_TARGET_URL);
 		String user = properties.getProperty(DB_TARGET_USER);
 		String password = properties.getProperty(DB_TARGET_PASSWORD);
@@ -107,7 +112,6 @@ public class SQL2SQLFactory implements RunnableFactory {
 	}
 	
 	private Connection createConnection(String url, String user, String password) throws ClassNotFoundException, SQLException {
-		Class.forName(JDBC_DRIVER_NAME);
 		Connection c = DriverManager.getConnection(url, user, password);
 		c.setAutoCommit(false);
 		return c;
@@ -117,6 +121,7 @@ public class SQL2SQLFactory implements RunnableFactory {
 		DefaultTaskExecutor dte = new DefaultTaskExecutor(new SQL2SQLFactory());
 		dte.showUI();
 		dte.start();
+		//dte.setThreadCount(1);
 	}
 
 }
