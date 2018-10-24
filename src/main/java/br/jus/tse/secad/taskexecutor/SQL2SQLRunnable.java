@@ -28,31 +28,73 @@ public class SQL2SQLRunnable implements Runnable {
 	}
 
 	public void run() {
+		Connection sourceConnection = null;
 		Connection targetConnection = null;
+		PreparedStatement sourceStatement = null;
 		PreparedStatement targetStatement = null;
+		ResultSet sourceResultSet = null;
 		ResultSet targetResultSet = null;
 		try {
-			log.info("Entrada [" + namedParameterMap.get("COD_OBJETO") + "]");
+			log.info("Entrada [" + index + "] params[" +  namedParameterMap + "]");
+			sourceConnection = factory.getSourceConnection();
 			targetConnection = factory.getTargetConnection();
 
-			String targetSql = PropertiesUtil.getProperty("db.target.sql.1");
-			NamedParamStatement namedParamStatement = new NamedParamStatement(targetConnection, targetSql,
+			String sourceSql = PropertiesUtil.getProperty("db.source.sql.1");
+			NamedParamStatement namedParamStatement = new NamedParamStatement(sourceConnection, sourceSql,
 					namedParameterMap);
 
+			sourceStatement = namedParamStatement.getPreparedStatement();
+			
+			sourceResultSet = sourceStatement.executeQuery();
+			if (!sourceResultSet.next())
+				return;
+			
+			HashMap<String, Object> namedParameterMap = new HashMap<String, Object>(sourceResultSet.getMetaData().getColumnCount());
+			
+			for(int i = 1; i <= sourceResultSet.getMetaData().getColumnCount(); i++) {
+				String columnName = sourceResultSet.getMetaData().getColumnName(i);
+				Object columnValue = sourceResultSet.getString(i);
+				namedParameterMap.put(columnName, columnValue);
+			}
+			
+			String targetSql = PropertiesUtil.getProperty("db.target.sql.1");
+			namedParamStatement = new NamedParamStatement(targetConnection, targetSql,
+					namedParameterMap);
+			
 			targetStatement = namedParamStatement.getPreparedStatement();
-
+			
 			int count = targetStatement.executeUpdate();
 			if (count > 0) {
 				targetConnection.commit();
-				log.info("Atualizado [" + index + "] [" + namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
+				log.info("Atualizado [" +  index + "] params[" +  namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
 						+ "]");
 			} else {
-				log.info("Não Atualizado[" + index + "] [" + namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
+				log.info("Não Atualizado[" + index + "] params[" +  namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
 					+ "]");
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
+			if (sourceResultSet != null) {
+				try {
+					sourceResultSet.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (sourceStatement != null) {
+				try {
+					sourceStatement.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (sourceConnection != null)
+				try {
+					sourceConnection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
 			if (targetResultSet != null) {
 				try {
 					targetResultSet.close();
