@@ -5,6 +5,8 @@ public class PropertyQuery implements Comparable<PropertyQuery> {
 	String key;
 
 	String sql;
+	
+	String sqlSize;
 
 	String dbID;
 
@@ -33,9 +35,17 @@ public class PropertyQuery implements Comparable<PropertyQuery> {
 	public String getSql() {
 		return sql;
 	}
+	
+	public String getSqlSize() {
+		return sqlSize;
+	}
 
 	public void setSql(String sql) {
 		this.sql = sql;
+	}
+
+	public void setSqlSize(String sqlSize) {
+		this.sqlSize = sqlSize;
 	}
 
 	public String getDbID() {
@@ -47,12 +57,15 @@ public class PropertyQuery implements Comparable<PropertyQuery> {
 	}
 
 	@Override
+	public int compareTo(PropertyQuery o) {
+		return key.compareTo(o.key);
+	}
+
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((dbID == null) ? 0 : dbID.hashCode());
 		result = prime * result + ((key == null) ? 0 : key.hashCode());
-		result = prime * result + ((sql == null) ? 0 : sql.hashCode());
 		return result;
 	}
 
@@ -65,31 +78,17 @@ public class PropertyQuery implements Comparable<PropertyQuery> {
 		if (getClass() != obj.getClass())
 			return false;
 		PropertyQuery other = (PropertyQuery) obj;
-		if (dbID == null) {
-			if (other.dbID != null)
-				return false;
-		} else if (!dbID.equals(other.dbID))
-			return false;
 		if (key == null) {
 			if (other.key != null)
 				return false;
 		} else if (!key.equals(other.key))
-			return false;
-		if (sql == null) {
-			if (other.sql != null)
-				return false;
-		} else if (!sql.equals(other.sql))
 			return false;
 		return true;
 	}
 
 	@Override
 	public String toString() {
-		return "PropertyQuery [key=" + key + ", sql=" + sql + ", dbID=" + dbID + "]";
+		return "PropertyQuery [key=" + key + ", sql=" + sql + ", dbID=" + dbID + ", sqlSize=" + sqlSize + "]";
 	}
-
-	@Override
-	public int compareTo(PropertyQuery o) {
-		return key.compareTo(o.key);
-	}
+		
 }

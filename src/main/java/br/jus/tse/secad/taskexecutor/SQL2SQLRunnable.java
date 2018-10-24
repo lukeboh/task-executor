@@ -41,7 +41,8 @@ public class SQL2SQLRunnable implements Runnable {
 			sourceConnection = factory.getSourceConnection();
 			targetConnection = factory.getTargetConnection();
 
-			for (PropertyQuery pq : PropertiesUtil.getPropertyQueryList()) {
+			for (int j = 1; j < PropertiesUtil.getPropertyQueryList().size(); j++) {
+				PropertyQuery pq = PropertiesUtil.getPropertyQueryList().get(j);
 				Connection connection = null;
 				if ("source".equals(pq.getDbID())) {
 					connection = sourceConnection;

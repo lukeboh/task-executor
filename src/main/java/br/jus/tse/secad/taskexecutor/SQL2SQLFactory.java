@@ -10,47 +10,55 @@ import org.apache.log4j.Logger;
 
 import br.jus.tse.secad.taskexecutor.util.ConnectionUtil;
 import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
+import br.jus.tse.secad.taskexecutor.util.PropertyQuery;
 
 public class SQL2SQLFactory implements RunnableFactory {
 	
 	private static Logger log = Logger.getLogger(SQL2SQLFactory.class);
 	int size = 0;
 	int index = 0;
-	private ResultSet sourceResultSet;
+	private ResultSet rs;
 
 	
 
 	public SQL2SQLFactory() throws Exception {
-		Connection sourceConnection = getSourceConnection();
 		
-		String sourceSqlSize = PropertiesUtil.getSourceSqlSize();
-		PreparedStatement sourceStatement = sourceConnection.prepareStatement(sourceSqlSize);
-		sourceResultSet = sourceStatement.executeQuery();
-		sourceResultSet.next();
-		size = sourceResultSet.getInt(1);
+		PropertyQuery pq0 = PropertiesUtil.getPropertyQueryList().get(0);
+		
+		Connection connection = null;
+		
+		if ("source".equals(pq0.getDbID())) {
+			connection =  getSourceConnection();
+		} else {
+			connection = getTargetConnection();
+		}
+		
+		PreparedStatement stmt = connection.prepareStatement(pq0.getSqlSize());
+		rs = stmt.executeQuery();
+		rs.next();
+		size = rs.getInt(1);
 		log.info("Size [" + size + "]");
 		
-		sourceResultSet.close();
-		sourceStatement.close();
+		rs.close();
+		stmt.close();
 		
-		String sourceSql = PropertiesUtil.getSourceSql();
-		sourceStatement = sourceConnection.prepareStatement(sourceSql);
-		sourceResultSet = sourceStatement.executeQuery();
+		stmt = connection.prepareStatement(pq0.getSql());
+		rs = stmt.executeQuery();
 	}
 	
 	
 	public Runnable next() {
 		try {
-			if (!sourceResultSet.next())
+			if (!rs.next())
 				return null;
 			else {
 				index++; 
 				
-				HashMap<String, Object> namedParameterMap = new HashMap<String, Object>(sourceResultSet.getMetaData().getColumnCount());
+				HashMap<String, Object> namedParameterMap = new HashMap<String, Object>(rs.getMetaData().getColumnCount());
 				
-				for(int i = 1; i <= sourceResultSet.getMetaData().getColumnCount(); i++) {
-					String columnName = sourceResultSet.getMetaData().getColumnName(i);
-					Object columnValue = sourceResultSet.getString(i);
+				for(int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+					String columnName = rs.getMetaData().getColumnName(i);
+					Object columnValue = rs.getString(i);
 					namedParameterMap.put(columnName, columnValue);
 				}
 				
