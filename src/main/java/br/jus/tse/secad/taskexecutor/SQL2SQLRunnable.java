@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 
 import br.jus.tse.secad.taskexecutor.util.NamedParamStatement;
 import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
+import br.jus.tse.secad.taskexecutor.util.PropertyQuery;
 
 public class SQL2SQLRunnable implements Runnable {
 
@@ -30,61 +31,68 @@ public class SQL2SQLRunnable implements Runnable {
 	public void run() {
 		Connection sourceConnection = null;
 		Connection targetConnection = null;
-		PreparedStatement sourceStatement = null;
-		PreparedStatement targetStatement = null;
-		ResultSet sourceResultSet = null;
-		ResultSet targetResultSet = null;
+		
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		int countUpdate = 0;
+		
 		try {
-			log.info("Entrada [" + index + "] params[" +  namedParameterMap + "]");
+			log.info("Entrada [" + index + "] params[" + namedParameterMap + "]");
 			sourceConnection = factory.getSourceConnection();
 			targetConnection = factory.getTargetConnection();
 
-			String sourceSql = PropertiesUtil.getProperty("db.source.sql.1");
-			NamedParamStatement namedParamStatement = new NamedParamStatement(sourceConnection, sourceSql,
-					namedParameterMap);
+			for (PropertyQuery pq : PropertiesUtil.getPropertyQueryList()) {
+				Connection connection = null;
+				if ("source".equals(pq.getDbID())) {
+					connection = sourceConnection;
+				} else {
+					connection = targetConnection;
+				}
 
-			sourceStatement = namedParamStatement.getPreparedStatement();
-			
-			sourceResultSet = sourceStatement.executeQuery();
-			if (!sourceResultSet.next())
-				return;
-			
-			HashMap<String, Object> namedParameterMap = new HashMap<String, Object>(sourceResultSet.getMetaData().getColumnCount());
-			
-			for(int i = 1; i <= sourceResultSet.getMetaData().getColumnCount(); i++) {
-				String columnName = sourceResultSet.getMetaData().getColumnName(i);
-				Object columnValue = sourceResultSet.getString(i);
-				namedParameterMap.put(columnName, columnValue);
+				NamedParamStatement namedParamStatement = new NamedParamStatement(connection, pq.getSql(),
+						namedParameterMap);
+				stmt = namedParamStatement.getPreparedStatement();
+
+				if (!namedParamStatement.isUpdate()) {
+					rs = stmt.executeQuery();
+					if (!rs.next())
+						return;
+
+					namedParameterMap = new HashMap<String, Object>(rs.getMetaData().getColumnCount());
+
+					for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
+						String columnName = rs.getMetaData().getColumnName(i);
+						Object columnValue = rs.getString(i);
+						namedParameterMap.put(columnName, columnValue);
+					}
+				} else {
+					countUpdate += stmt.executeUpdate();
+				}
 			}
 			
-			String targetSql = PropertiesUtil.getProperty("db.target.sql.1");
-			namedParamStatement = new NamedParamStatement(targetConnection, targetSql,
-					namedParameterMap);
-			
-			targetStatement = namedParamStatement.getPreparedStatement();
-			
-			int count = targetStatement.executeUpdate();
-			if (count > 0) {
+			if (countUpdate > 0) {
 				targetConnection.commit();
-				log.info("Atualizado [" +  index + "] params[" +  namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
-						+ "]");
+				log.info("Atualizado [" + index + "] params[" + namedParameterMap.get("COD_OBJETO") + "]"
+						+ " quantidade [" + countUpdate + "]");
 			} else {
-				log.info("Não Atualizado[" + index + "] params[" +  namedParameterMap.get("COD_OBJETO") + "]" + " quantidade [" + count
-					+ "]");
+				log.info("Não Atualizado[" + index + "] params[" + namedParameterMap.get("COD_OBJETO") + "]"
+						+ " quantidade [" + countUpdate + "]");
 			}
+
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
-			if (sourceResultSet != null) {
+			if (rs != null) {
 				try {
-					sourceResultSet.close();
+					rs.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
 			}
-			if (sourceStatement != null) {
+			if (stmt != null) {
 				try {
-					sourceStatement.close();
+					stmt.close();
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
@@ -95,20 +103,6 @@ public class SQL2SQLRunnable implements Runnable {
 				} catch (SQLException e) {
 					e.printStackTrace();
 				}
-			if (targetResultSet != null) {
-				try {
-					targetResultSet.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
-			if (targetStatement != null) {
-				try {
-					targetStatement.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-			}
 			if (targetConnection != null)
 				try {
 					targetConnection.close();

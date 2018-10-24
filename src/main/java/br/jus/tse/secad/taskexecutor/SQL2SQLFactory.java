@@ -44,7 +44,7 @@ public class SQL2SQLFactory implements RunnableFactory {
 			if (!sourceResultSet.next())
 				return null;
 			else {
-				index++;
+				index++; 
 				
 				HashMap<String, Object> namedParameterMap = new HashMap<String, Object>(sourceResultSet.getMetaData().getColumnCount());
 				
