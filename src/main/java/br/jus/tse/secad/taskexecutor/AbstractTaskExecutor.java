@@ -303,12 +303,12 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 		initializedTasksTable.put(task, new TaskData());
 	}
 	
-	public final synchronized void taskEnd(Object task) {
+	public final synchronized void taskEnd(TaskDecorator task) {
 		TaskData taskData = initializedTasksTable.get(task);
 		if (taskData == null){
 			throw new RuntimeException("Tentando finalizar tarefa não iniciada [" + task + "]");
 		}
-		completedTaskCount++;
+		completedTaskCount+= task.getSize();
 		taskData.end();
 		initializedTasksTable.remove(task);
 		long thisTasktime = lastTaskTime = taskData.getTaskTime();
@@ -364,7 +364,7 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 
 	public class TaskDecorator implements Runnable {
 
-		private Runnable toRun;
+		private Task toRun;
 
 		TaskDecorator(Task toRun) {
 			this.toRun = toRun;
@@ -374,7 +374,10 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 			taskStart(this);
 			toRun.run();
 			taskEnd(this);
-			
+		}
+		
+		public int getSize(){
+			return toRun.getSize();
 		}
 	}
 	/*
