@@ -32,16 +32,16 @@ public class DefaultTaskExecutor extends AbstractTaskExecutor {
 	 */
 	private long tasksCount;
 
-	private RunnableFactory runnableFactory;
+	private TaskFactory runnableFactory;
 	
 	public DefaultTaskExecutor() {
 	}
 	
-	public DefaultTaskExecutor(RunnableFactory factory){
+	public DefaultTaskExecutor(TaskFactory factory){
 		this.runnableFactory = factory;
 	}
 	
-	public void setRunnableFactory(RunnableFactory runnableFactory) {
+	public void setRunnableFactory(TaskFactory runnableFactory) {
 		this.runnableFactory = runnableFactory;
 	}
 
@@ -52,14 +52,14 @@ public class DefaultTaskExecutor extends AbstractTaskExecutor {
 				initialThreadsSize == 0 ? 1 : initialThreadsSize, 1, TimeUnit.SECONDS, tasksQueue,
 				new ThreadPoolExecutor.CallerRunsPolicy());
 
-		this.tasksCount = runnableFactory.size();
+		this.tasksCount = runnableFactory.getSize();
 
 		new Thread("Producer") {
 			public void run() {
-				Runnable next = null;
+				Task next = null;
 				long taskProduced = 0;
 				while ((next = runnableFactory.next()) != null) {
-					threadPool.submit(new Task(next));
+					threadPool.submit(new TaskDecorator(next));
 					taskProduced++;
 				}
 				if (DefaultTaskExecutor.this.tasksCount == 0)

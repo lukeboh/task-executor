@@ -362,11 +362,11 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 			return "--/--/--";
 	}
 
-	public class Task implements Runnable {
+	public class TaskDecorator implements Runnable {
 
 		private Runnable toRun;
 
-		Task(Runnable toRun) {
+		TaskDecorator(Task toRun) {
 			this.toRun = toRun;
 		}
 

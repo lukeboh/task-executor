@@ -12,7 +12,7 @@ import br.jus.tse.secad.taskexecutor.util.NamedParameterMap;
 import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
 import br.jus.tse.secad.taskexecutor.util.PropertyQuery;
 
-public class SQL2SQLFactory implements RunnableFactory {
+public class SQL2SQLFactory implements TaskFactory {
 
 	private static Logger log = Logger.getLogger(SQL2SQLFactory.class);
 	int size = 0;
@@ -47,12 +47,12 @@ public class SQL2SQLFactory implements RunnableFactory {
 		rs = stmt.executeQuery();
 	}
 
-	public Runnable next() {
+	public Task next() {
 		try {
 			NamedParameterMap npm = new NamedParameterMap(bulkSize, rs);
 			if (!npm.isEmpty()) {
 				index += npm.getSize();
-				return new SQL2SQLRunnable(this, index, npm);	
+				return new SQL2SQLTask(this, index, npm);	
 			} else {
 				return null;
 			}
@@ -63,7 +63,7 @@ public class SQL2SQLFactory implements RunnableFactory {
 		return null;
 	}
 
-	public int size() {
+	public int getSize() {
 		return size;
 	}
 

@@ -12,9 +12,9 @@ import br.jus.tse.secad.taskexecutor.util.NamedParameterMap;
 import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
 import br.jus.tse.secad.taskexecutor.util.PropertyQuery;
 
-public class SQL2SQLRunnable implements Runnable {
+public class SQL2SQLTask implements Task {
 
-	private static Logger log = Logger.getLogger(SQL2SQLRunnable.class);
+	private static Logger log = Logger.getLogger(SQL2SQLTask.class);
 
 	public int index;
 	
@@ -24,7 +24,7 @@ public class SQL2SQLRunnable implements Runnable {
 
 	private NamedParameterMap namedParameterMap;
 
-	public SQL2SQLRunnable(SQL2SQLFactory sql2sqlFactory, int index2, NamedParameterMap namedParameterMap) {
+	public SQL2SQLTask(SQL2SQLFactory sql2sqlFactory, int index2, NamedParameterMap namedParameterMap) {
 		this.factory = sql2sqlFactory;
 		this.index = index2;
 		this.namedParameterMap = namedParameterMap;
