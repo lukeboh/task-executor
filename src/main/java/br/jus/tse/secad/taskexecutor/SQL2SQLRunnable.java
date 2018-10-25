@@ -17,6 +17,8 @@ public class SQL2SQLRunnable implements Runnable {
 	private static Logger log = Logger.getLogger(SQL2SQLRunnable.class);
 
 	public int index;
+	
+	public int size;
 
 	private SQL2SQLFactory factory;
 
@@ -26,6 +28,11 @@ public class SQL2SQLRunnable implements Runnable {
 		this.factory = sql2sqlFactory;
 		this.index = index2;
 		this.namedParameterMap = namedParameterMap;
+		this.size = namedParameterMap.getSize();
+	}
+	
+	public int getSize() {
+		return size;
 	}
 
 	public void run() {
@@ -60,7 +67,10 @@ public class SQL2SQLRunnable implements Runnable {
 					if (namedParameterMap.isEmpty())
 						return;
 				} else {
-					countUpdate += stmt.executeUpdate();
+					int [] count = stmt.executeBatch();
+					for (int i : count) {
+						countUpdate += i;
+					}
 				}
 			}
 

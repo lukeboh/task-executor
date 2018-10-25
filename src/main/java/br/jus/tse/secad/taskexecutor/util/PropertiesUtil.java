@@ -17,6 +17,7 @@ public class PropertiesUtil {
 	private static final String CONFIG_PROPERTIES_FILENAME = "config.properties";
 
 	private static final String QUEUE_SIZE = "queue.size";
+	private static final String BULK_SIZE = "bulk.size";
 	private static final String SQL_PREFIX = "db.sql";
 	private static final String SQL_SIZE_SUFFIX = ".size";
 
@@ -34,6 +35,10 @@ public class PropertiesUtil {
 
 	public static int getQueueSize() {
 		return Integer.parseInt(getProperty(QUEUE_SIZE, "200"));
+	}
+	
+	public static int getBulkSize() {
+		return Integer.parseInt(getProperty(BULK_SIZE, "1"));
 	}
 
 	public static List<PropertyQuery> getPropertyQueryList() {

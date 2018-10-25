@@ -21,6 +21,8 @@ public class SQL2SQLFactory implements RunnableFactory {
 	private ResultSet rs;
 
 	public SQL2SQLFactory() throws Exception {
+		
+		bulkSize = PropertiesUtil.getBulkSize();
 
 		PropertyQuery pq0 = PropertiesUtil.getPropertyQueryList().get(0);
 

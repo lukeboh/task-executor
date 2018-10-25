@@ -7,6 +7,7 @@ import java.util.List;
 
 public class NamedParameterMap {
 	private List<String> columnNamesList;
+	private List<String> columnTypesList;
 	private List<List<Object>> columnValuesLists;
 
 	public NamedParameterMap(int bulkSize, ResultSet rs) throws SQLException {
@@ -15,11 +16,14 @@ public class NamedParameterMap {
 		}
 		int columnCount = rs.getMetaData().getColumnCount();
 		columnNamesList = new ArrayList<>(columnCount);
+		columnTypesList = new ArrayList<>(columnCount);
 		columnValuesLists = new ArrayList<>(columnCount);
 		
 		for (int i = 1; i <= columnCount; i++) {
 			addColumn(rs.getMetaData().getColumnName(i));
+			addType(rs.getMetaData().getColumnTypeName(i));
 		}
+		
 		for (int iBulk = 0; iBulk < bulkSize; iBulk++) {
 			//Na primeira iteração já andou no começo do construtor.
 			if (iBulk != 0 && !rs.next()) {
@@ -46,6 +50,10 @@ public class NamedParameterMap {
 			throw new RuntimeException("Coluna já existente [" + columnName + "]");
 		}
 	}
+	
+	public void addType(String type) {
+		columnTypesList.add(type);
+	}
 
 	public List<String> getColumnNames() {
 		return columnNamesList;
@@ -59,6 +67,10 @@ public class NamedParameterMap {
 
 	public List<Object> getValues(String columnName) {
 		return columnValuesLists.get(columnNamesList.indexOf(columnName));
+	}
+	
+	public String getType(String columnName) {
+		return columnTypesList.get(columnNamesList.indexOf(columnName));
 	}
 
 	public Object getValue(String columnName, int index) {
@@ -75,6 +87,8 @@ public class NamedParameterMap {
 
 	@Override
 	public String toString() {
-		return "NamedParameterMap [columnNamesList=" + columnNamesList + ", getSize()=" + getSize() + "]";
+		return "NamedParameterMap [columnNamesList=" + columnNamesList + ", columnTypesList=" + columnTypesList
+				+ ", getSize()=" + getSize() + "]";
 	}
+
 }
