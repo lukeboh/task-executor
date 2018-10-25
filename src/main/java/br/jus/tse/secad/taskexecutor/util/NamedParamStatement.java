@@ -5,7 +5,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 public class NamedParamStatement {
@@ -29,7 +28,7 @@ public class NamedParamStatement {
 		this.sql = sql;
 	}
 
-	public NamedParamStatement(Connection conn, String sql, HashMap<String, Object> namedParamMap) throws SQLException {
+	public NamedParamStatement(Connection conn, String sql, NamedParameterMap namedParamMap) throws SQLException {
 		this(conn, sql);
 		setMap(namedParamMap);
 	}
@@ -54,9 +53,9 @@ public class NamedParamStatement {
 		prepStmt.setString(getIndex(name), value);
 	}
 
-	public void setMap(HashMap<String, Object> namedParamMap) throws SQLException {
-		for (String columnName : namedParamMap.keySet()) {
-			setString(columnName, (String) namedParamMap.get(columnName));
+	public void setMap(NamedParameterMap namedParamMap) throws SQLException {
+		for (String columnName : namedParamMap.getColumnNames()) {
+			setString(columnName, (String) namedParamMap.getValue(columnName, 0));
 		}
 	}
 

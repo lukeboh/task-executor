@@ -4,11 +4,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 
 import br.jus.tse.secad.taskexecutor.util.NamedParamStatement;
+import br.jus.tse.secad.taskexecutor.util.NamedParameterMap;
 import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
 import br.jus.tse.secad.taskexecutor.util.PropertyQuery;
 
@@ -20,9 +20,9 @@ public class SQL2SQLRunnable implements Runnable {
 
 	private SQL2SQLFactory factory;
 
-	private HashMap<String, Object> namedParameterMap;
+	private NamedParameterMap namedParameterMap;
 
-	public SQL2SQLRunnable(SQL2SQLFactory sql2sqlFactory, int index2, HashMap<String, Object> namedParameterMap) {
+	public SQL2SQLRunnable(SQL2SQLFactory sql2sqlFactory, int index2, NamedParameterMap namedParameterMap) {
 		this.factory = sql2sqlFactory;
 		this.index = index2;
 		this.namedParameterMap = namedParameterMap;
@@ -56,16 +56,9 @@ public class SQL2SQLRunnable implements Runnable {
 
 				if (!namedParamStatement.isUpdate()) {
 					rs = stmt.executeQuery();
-					if (!rs.next())
+					namedParameterMap = new NamedParameterMap(rs);
+					if (namedParameterMap.isEmpty())
 						return;
-
-					namedParameterMap = new HashMap<String, Object>(rs.getMetaData().getColumnCount());
-
-					for (int i = 1; i <= rs.getMetaData().getColumnCount(); i++) {
-						String columnName = rs.getMetaData().getColumnName(i);
-						Object columnValue = rs.getString(i);
-						namedParameterMap.put(columnName, columnValue);
-					}
 				} else {
 					countUpdate += stmt.executeUpdate();
 				}
@@ -73,11 +66,11 @@ public class SQL2SQLRunnable implements Runnable {
 
 			if (countUpdate > 0) {
 				targetConnection.commit();
-				log.info("Atualizado [" + index + "] params[" + namedParameterMap.get("COD_OBJETO") + "]"
-						+ " quantidade [" + countUpdate + "]");
+				log.info("Atualizado [" + index + "] params[" + namedParameterMap + "]" + " quantidade [" + countUpdate
+						+ "]");
 			} else {
-				log.info("Não Atualizado[" + index + "] params[" + namedParameterMap.get("COD_OBJETO") + "]"
-						+ " quantidade [" + countUpdate + "]");
+				log.info("Não Atualizado[" + index + "] params[" + namedParameterMap + "]" + " quantidade ["
+						+ countUpdate + "]");
 			}
 
 		} catch (Exception e) {
