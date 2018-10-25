@@ -267,7 +267,7 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 				if (task.getEndTime().getTime() > lastFinished) {
 					lastFinished = task.getEndTime().getTime();
 				}
-				amout++;
+				amout+=task.getSize();
 			}
 			returnz = 1.0D * amout / (lastFinished - firstFinished);
 			if (!Double.isInfinite(returnz))
@@ -295,12 +295,12 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 			return returnz + "milis";
 	}
 
-	public final synchronized void taskStart(Object task) {
+	public final synchronized void taskStart(Task task) {
 		if (initializedTasksTable.contains(task)){
 			throw new RuntimeException("Tentando iniciar tarefa já iniciada [" + task + "]");
 		}
 		processingStart();
-		initializedTasksTable.put(task, new TaskData());
+		initializedTasksTable.put(task, new TaskData(task.getSize()));
 	}
 	
 	public final synchronized void taskEnd(TaskDecorator task) {
@@ -362,7 +362,7 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 			return "--/--/--";
 	}
 
-	public class TaskDecorator implements Runnable {
+	public class TaskDecorator implements Task {
 
 		private Task toRun;
 
@@ -386,11 +386,17 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 	private class TaskData {
 		private Date initialTime;
 		private Date endTime;
+		private int size;
 		
-		public TaskData() {
+		public TaskData(int size) {
+			this.size = size;
 			this.initialTime = new Date();
 		}
 		
+		public int getSize() {
+			return size;
+		}
+
 		public void end(){
 			this.endTime = new Date();
 		}
