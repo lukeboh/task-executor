@@ -87,8 +87,42 @@ public class NamedParameterMap {
 
 	@Override
 	public String toString() {
-		return "NamedParameterMap [columnNamesList=" + columnNamesList + ", columnTypesList=" + columnTypesList
-				+ ", getSize()=" + getSize() + "]";
+		StringBuilder builder = new StringBuilder();
+		builder.append("NamedParameterMap [columnNamesList=");
+		builder.append(columnNamesList);
+		builder.append(", columnTypesList=");
+		builder.append(columnTypesList);
+		
+		builder.append(", getSize()=");
+		builder.append(getSize());
+
+		builder.append(", columnValuesLists=");
+		
+		if (columnNamesList.get(0) != null) {
+			Object firstObject = columnValuesLists.get(0).get(0);
+			
+			builder.append(limitator(firstObject));
+			builder.append(" ... ");
+			List<Object> lastList = columnValuesLists.get(columnValuesLists.size() - 1);
+			Object lastObject = lastList.get(lastList.size() - 1);
+			
+			builder.append(limitator(lastObject));
+		}
+		
+		builder.append("]");
+		return builder.toString();
 	}
+	
+	private String limitator (Object o) {
+		if (o == null) {
+			return null;
+		}
+		String s = o.toString();
+		if (s.length() > 20) {
+			return s.substring(0, 20);
+		}
+		return s;
+	}
+	
 
 }
