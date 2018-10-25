@@ -1,7 +1,5 @@
 /target/
-/log4j.log
+/*.log
 /.classpath
 /.project
-/config.properties
-/source-datasource.properties
-/target-datasource.properties
+/*.properties
