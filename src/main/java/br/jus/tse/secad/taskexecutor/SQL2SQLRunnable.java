@@ -31,13 +31,13 @@ public class SQL2SQLRunnable implements Runnable {
 	public void run() {
 		Connection sourceConnection = null;
 		Connection targetConnection = null;
-		
+
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		int countUpdate = 0;
-		
+
 		try {
-			log.info("Entrada [" + index + "] params[" + namedParameterMap + "]");
+			// log.info("Entrada [" + index + "] params[" + namedParameterMap + "]");
 			sourceConnection = factory.getSourceConnection();
 			targetConnection = factory.getTargetConnection();
 
@@ -70,7 +70,7 @@ public class SQL2SQLRunnable implements Runnable {
 					countUpdate += stmt.executeUpdate();
 				}
 			}
-			
+
 			if (countUpdate > 0) {
 				targetConnection.commit();
 				log.info("Atualizado [" + index + "] params[" + namedParameterMap.get("COD_OBJETO") + "]"
@@ -80,35 +80,34 @@ public class SQL2SQLRunnable implements Runnable {
 						+ " quantidade [" + countUpdate + "]");
 			}
 
-			
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.error("Falha com params[ " + namedParameterMap + "]", e);
 		} finally {
 			if (rs != null) {
 				try {
 					rs.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					log.error("Falha no ResultSet com params[ " + namedParameterMap + "]", e);
 				}
 			}
 			if (stmt != null) {
 				try {
 					stmt.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					log.error("Falha no Statement com params[ " + namedParameterMap + "]", e);
 				}
 			}
 			if (sourceConnection != null)
 				try {
 					sourceConnection.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					log.error("Falha na conexão source com params[ " + namedParameterMap + "]", e);
 				}
 			if (targetConnection != null)
 				try {
 					targetConnection.close();
 				} catch (SQLException e) {
-					e.printStackTrace();
+					log.error("Falha na conexão target com params[ " + namedParameterMap + "]", e);
 				}
 		}
 	}
