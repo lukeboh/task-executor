@@ -382,7 +382,7 @@ public class CustomizedThreadPoolExecutor extends ThreadPoolExecutor {
     /**
      * Invoke the rejected execution handler for the given command.
      */
-    void reject(Runnable command) {
+    private void rejectx(Runnable command) {
         handler.rejectedExecution(command, this);
     }
 
@@ -865,7 +865,7 @@ public class CustomizedThreadPoolExecutor extends ThreadPoolExecutor {
             throw new NullPointerException();
         for (;;) {
             if (runState != RUNNING) {
-                reject(command);
+                rejectx(command);
                 return;
             }
             if (poolSize < corePoolSize && addIfUnderCorePoolSize(command)){

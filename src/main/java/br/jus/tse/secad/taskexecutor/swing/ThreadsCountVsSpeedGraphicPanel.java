@@ -12,11 +12,11 @@ import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.chart.ui.UIUtils;
 import org.jfree.data.time.Second;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.RefineryUtilities;
 
 public class ThreadsCountVsSpeedGraphicPanel extends JPanel {
 
@@ -93,7 +93,7 @@ public class ThreadsCountVsSpeedGraphicPanel extends JPanel {
 		final ThreadsCountVsSpeedGraphicPanel panel = new ThreadsCountVsSpeedGraphicPanel();
 		demo.getContentPane().add(panel);
 		demo.pack();
-		RefineryUtilities.centerFrameOnScreen(demo);
+		UIUtils.centerFrameOnScreen(demo);
 		demo.setVisible(true);
 		new Thread() {
 			public void run() {

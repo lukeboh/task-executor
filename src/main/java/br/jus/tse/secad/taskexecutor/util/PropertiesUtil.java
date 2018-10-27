@@ -53,6 +53,10 @@ public class PropertiesUtil {
 		return properties.getProperty(property, defautValue);
 	}
 
+	public static Properties getProperties() {
+		return properties;
+	}
+	
 	private static void loadQueryList() {
 		for (Map.Entry<Object, Object> pair : properties.entrySet()) {
 			String key = (String) pair.getKey();

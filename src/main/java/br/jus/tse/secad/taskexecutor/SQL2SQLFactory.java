@@ -21,6 +21,14 @@ public class SQL2SQLFactory implements TaskFactory {
 	private ResultSet rs;
 
 	public SQL2SQLFactory() throws Exception {
+		log.info(" ______    _______                                   ");
+		log.info(" |  __|   |__   __|                                  ");
+		log.info(" | |_   _    | |                                     ");
+		log.info(" |  _| |_|   | |    H R E A D      Starting...       ");
+		log.info(" | |         | |                                     ");
+		log.info(" |_|         |_|                                     ");
+		log.info("                                                     ");
+		log.info("Propriedades [" + PropertiesUtil.getProperties() + "]");
 		
 		bulkSize = PropertiesUtil.getBulkSize();
 
@@ -35,16 +43,19 @@ public class SQL2SQLFactory implements TaskFactory {
 		}
 
 		PreparedStatement stmt = connection.prepareStatement(pq0.getSqlSize());
+		log.info("Executando query para estimativa de tamanho de trabalho...");
 		rs = stmt.executeQuery();
 		rs.next();
 		size = rs.getInt(1);
-		log.info("Size [" + size + "]");
+		log.info("Tamanho de Trabalho [" + size + "]");
 
 		rs.close();
 		stmt.close();
 
 		stmt = connection.prepareStatement(pq0.getSql());
+		log.info("Executando query 0...");
 		rs = stmt.executeQuery();
+		log.info("Query 0, primeiro retorno executado.");
 	}
 
 	public Task next() {
@@ -79,7 +90,7 @@ public class SQL2SQLFactory implements TaskFactory {
 		DefaultTaskExecutor dte = new DefaultTaskExecutor(new SQL2SQLFactory());
 		dte.showUI();
 		dte.start();
-		// dte.setThreadCount(1);
+		//dte.setThreadCount(8);
 	}
 
 }
