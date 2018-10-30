@@ -13,6 +13,7 @@ import javax.swing.JFrame;
 import org.apache.log4j.Logger;
 
 import br.jus.tse.secad.taskexecutor.swing.BasicControlPanel;
+import br.jus.tse.secad.taskexecutor.util.PropertiesUtil;
 import br.jus.tse.secad.taskexecutor.util.RelativeDateFormat;
 import br.jus.tse.secad.taskexecutor.util.TimeUnit1Ponto6;
 
@@ -325,6 +326,7 @@ public abstract class AbstractTaskExecutor implements TaskExecutor {
 	
 	public void showUI(boolean exitOnClose) {
 		JFrame f = BasicControlPanel.getJFrame(this);
+		f.setTitle(PropertiesUtil.getProcessDescription());
 		if (exitOnClose)
 			f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		f.setVisible(true);

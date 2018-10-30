@@ -20,7 +20,8 @@ public class PropertiesUtil {
 	private static final String BULK_SIZE = "bulk.size";
 	private static final String SQL_PREFIX = "db.sql";
 	private static final String SQL_SIZE_SUFFIX = ".size";
-
+	private static final String PROCESS_DESCRIPTION = "process.description";
+	
 	static {
 		properties = new Properties();
 		try {
@@ -85,6 +86,10 @@ public class PropertiesUtil {
 		propertyQueryList = new ArrayList<PropertyQuery>(propertyQueryMap.values());
 		Collections.sort(propertyQueryList);
 		propertyQueryList = Collections.unmodifiableList(propertyQueryList);
+	}
+
+	public static String getProcessDescription() {
+		return getProperty(PROCESS_DESCRIPTION);
 	}
 
 }

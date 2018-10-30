@@ -68,15 +68,21 @@ public class NamedParamStatement {
 	}
 
 	public void setInt(String name, int value) throws SQLException {
-		prepStmt.setInt(getIndex(name), value);
+		int index = getIndex(name);
+		if (index > 0)
+			prepStmt.setInt(index, value);
 	}
 
 	public void setString(String name, String value) throws SQLException {
-		prepStmt.setString(getIndex(name), value);
+		int index = getIndex(name);
+		if (index > 0)
+			prepStmt.setString(index, value);
 	}
 
 	public void setArray(String name, Array value) throws SQLException {
-		prepStmt.setArray(getIndex(name), value);
+		int index = getIndex(name);
+		if (index > 0)
+			prepStmt.setArray(index, value);
 	}
 
 	public void setMap(NamedParameterMap npm) throws SQLException {

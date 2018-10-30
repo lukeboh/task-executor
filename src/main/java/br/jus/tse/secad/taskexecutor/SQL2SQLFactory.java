@@ -21,15 +21,16 @@ public class SQL2SQLFactory implements TaskFactory {
 	private ResultSet rs;
 
 	public SQL2SQLFactory() throws Exception {
-		log.info(" ______    _______                                   ");
-		log.info(" |  __|   |__   __|                                  ");
-		log.info(" | |_   _    | |                                     ");
-		log.info(" |  _| |_|   | |    H R E A D      Starting...       ");
-		log.info(" | |         | |                                     ");
-		log.info(" |_|         |_|                                     ");
-		log.info("                                                     ");
-		log.info("Propriedades [" + PropertiesUtil.getProperties() + "]");
+		log.info("	______          _____  _   _ ______  _____   ___  ______  ");
+		log.info("	|  ___|        |_   _|| | | || ___ \\|  ___| / _ \\ |  _  \\ ");
+		log.info("	| |_    ______   | |  | |_| || |_/ /| |__  / /_\\ \\| | | | ");
+		log.info("	|  _|  |______|  | |  |  _  ||    / |  __| |  _  || | | |     Starting [" + PropertiesUtil.getProcessDescription() + "]");
+		log.info("	| |              | |  | | | || |\\ \\ | |___ | | | || |/ /  ");
+		log.info("	\\_|              \\_/  \\_| |_/\\_| \\_|\\____/ \\_| |_/|___/   ");
+
 		
+		log.info("Propriedades [" + PropertiesUtil.getProperties() + "]");
+
 		bulkSize = PropertiesUtil.getBulkSize();
 
 		PropertyQuery pq0 = PropertiesUtil.getPropertyQueryList().get(0);
@@ -63,11 +64,11 @@ public class SQL2SQLFactory implements TaskFactory {
 			NamedParameterMap npm = new NamedParameterMap(bulkSize, rs);
 			if (!npm.isEmpty()) {
 				index += npm.getSize();
-				return new SQL2SQLTask(this, index, npm);	
+				return new SQL2SQLTask(this, index, npm);
 			} else {
 				return null;
 			}
-			
+
 		} catch (SQLException e1) {
 			log.error("Falha de banco", e1);
 		}
@@ -90,7 +91,7 @@ public class SQL2SQLFactory implements TaskFactory {
 		DefaultTaskExecutor dte = new DefaultTaskExecutor(new SQL2SQLFactory());
 		dte.showUI();
 		dte.start();
-		//dte.setThreadCount(8);
+		// dte.setThreadCount(1);
 	}
 
 }

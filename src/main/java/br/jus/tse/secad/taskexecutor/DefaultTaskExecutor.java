@@ -54,7 +54,7 @@ public class DefaultTaskExecutor extends AbstractTaskExecutor {
 
 		this.tasksCount = runnableFactory.getSize();
 
-		new Thread("Producer") {
+		Thread producer = new Thread("Producer") {
 			public void run() {
 				Task next = null;
 				long taskProduced = 0;
@@ -65,7 +65,9 @@ public class DefaultTaskExecutor extends AbstractTaskExecutor {
 				if (DefaultTaskExecutor.this.tasksCount == 0)
 					DefaultTaskExecutor.this.tasksCount = taskProduced;
 			};
-		}.start();
+		};
+		producer.setPriority(Thread.MAX_PRIORITY);
+		producer.start();
 	}
 
 	public int getThreadCount() {
