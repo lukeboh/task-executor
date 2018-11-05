@@ -2,8 +2,8 @@
 <!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
 <log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/" debug="false">
    <appender name="FILE" class="org.apache.log4j.FileAppender">
-      <param name="File" value="log4j-hmg-update-lb-tam-dedo-biometria.log"/>
-      <param name="Append" value="true"/>
+      <param name="File" value="log4j.log"/>
+      <param name="Append" value="false"/>
       <param name="Threshold" value="INFO"/>
       <layout class="org.apache.log4j.PatternLayout">
          <!-- The default pattern: Date Priority [Category] Message\n -->
