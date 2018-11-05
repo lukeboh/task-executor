@@ -82,7 +82,7 @@ public class NamedParameterMap {
 	}
 	
 	public boolean isEmpty() {
-		return columnValuesLists.get(0).size() == 0;
+		return columnNamesList == null || columnNamesList.isEmpty();
 	}
 
 	@Override
